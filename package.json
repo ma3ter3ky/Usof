@@ -1,0 +1,33 @@
+{
+  "name": "usof",
+  "version": "1.0.0",
+  "description": "### Allowed stack",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ma3ter3ky/Usof.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ma3ter3ky/Usof/issues"
+  },
+  "homepage": "https://github.com/ma3ter3ky/Usof#readme",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "pino": "^9.9.5"
+  },
+  "type": "module"
+}

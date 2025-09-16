@@ -1,0 +1,16 @@
+openapi: 3.0.3
+info:
+  title: USOF API
+  version: 0.1.0
+  description: >
+    API for USOF (StackOverflow-like Q&A).
+    Contract-first spec (OpenAPI 3).
+servers:
+  - url: http://localhost:3000/api
+    description: Local dev
+  - url: https://usof.example.com/api
+    description: Production
+
+paths: {}
+components:
+  schemas: {}

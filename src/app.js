@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
 import { logger } from './logger.js'
+import { assertDbConnection } from './db.js'
 
 const app = express()
 
@@ -16,8 +17,13 @@ app.use((req, _res, next) => {
   next()
 })
 
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok' })
+app.get('/health', async (_req, res, next) => {
+  try {
+    await assertDbConnection()
+    res.status(200).json({ status: 'ok', db: 'up' })
+  } catch (err) {
+    next(err)
+  }
 })
 
 app.use((req, res) => {

@@ -21,3 +21,16 @@
 - Planned first 10 hours roadmap (kept notes in Notion).
 
 **Result:** Repo with minimal docs, `/docs` folder and `openapi.yaml` skeleton created. Ready to proceed to environment and linting setup (Hour 2).
+
+### Act: Basic (Hour 2) — Environment, tooling, linting/formatting
+
+- Installed core runtime deps: express, cors, helmet, compression, dotenv, pino.
+- Added ESLint (standard config), Prettier, lint-staged, Husky (v9).
+- Configured scripts:
+  - `dev` (node --watch), `start`, `lint`, `format`, `test` (placeholder).
+- Implemented minimal server with health endpoint and centralized error handler.
+- Enabled pre-commit hook (Husky v9) to run lint-staged (Prettier + ESLint) on staged files.
+- Verified:
+  - `npm run dev` boots and reloads on file changes.
+  - `/health` returns 200 OK JSON.
+  - Linting and pre-commit gate work as expected.

@@ -34,3 +34,51 @@
   - `npm run dev` boots and reloads on file changes.
   - `/health` returns 200 OK JSON.
   - Linting and pre-commit gate work as expected.
+
+### Act: Basic — SQL setup (Local MySQL 8)
+
+- Started MySQL server and confirmed it’s running.
+- Created dedicated app user `usof` with password auth and two databases: `usof_dev`, `usof_test` (UTF8MB4).
+- Wired 12-factor DB config into `.env` and `.env.example`.
+- Installed `knex` + `mysql2`, added `knexfile.js` (dev/test) and `src/db.js`.
+- Extended `/health` to check DB connectivity (returns `{ status: 'ok', db: 'up' }`).
+
+**Result:** Application reliably connects to local MySQL; dev/test DBs isolated and ready for migrations.
+
+### Act: Basic (Hour 4) — Express skeleton, health, centralized errors
+
+- Created Express skeleton with clear layers: routes, controllers, services, repositories, models (no ORM), middlewares, utils.
+- Implemented `/health` with version (from package.json) and DB connectivity check (`db: 'up'`).
+- Added `405 Method Not Allowed` for non-GET requests on `/health`.
+- Added global `404 Not Found` for unknown routes.
+- Implemented centralized JSON error handler with consistent shape and MDN-based status codes.
+- Enabled structured request logging using pino-http.
+  **Result:** Stable base for future endpoints; unified error format; observability via logs; health endpoint shows app version and DB status.
+
+### Act: Basic (Hour 5) — Testing baseline (ESM with Jest)
+
+- Issue: Jest failed on ESM imports (“Cannot use import statement outside a module”).
+- Solution: Run Jest with native ESM:
+  - Added `jest.config.js` with `transform: {}`, `extensionsToTreatAsEsm: ['.js']`, `setupFiles`.
+  - Set `NODE_OPTIONS=--experimental-vm-modules` in `npm test` scripts.
+  - Ensured `.env.test` is used via `dotenv/config` and `tests/jest.env.js`.
+- Wrote and passed integration tests:
+  - `GET /health` → `200` + `{ status: 'ok', db: 'up' }` + version.
+  - 404 for unknown routes and 405 for non-GET on `/health`.
+
+**Result:** Jest reliably runs ESM tests against the test DB; green baseline achieved.
+
+### Act: Basic (Hour 6) — Database migrations
+
+- Implemented schema migrations with Knex for entities required by PDF:
+  - users, categories, posts, post_categories, comments, likes, email_verification_tokens, password_reset_tokens.
+- Added constraints and indexes:
+  - users: unique login/email, role enum (user/admin).
+  - posts/comments: status enum (active/inactive), is_locked.
+  - likes: unique author+target (post or comment), CHECK constraint for exclusive target.
+  - FKs with CASCADE on delete where appropriate.
+- Fixed rollback logic: removed invalid `DROP TYPE` statements (MySQL enums are column-scoped, not global types).
+- Verified cycle: `db:migrate` → schema created; `db:rollback` → schema dropped cleanly.
+- Observed internal Knex tables (`knex_migrations`, `knex_migrations_lock`) which track applied migrations and concurrency locks.
+
+**Result:** Stable, normalized DB schema ready for seeding; migrations/rollback run cleanly.

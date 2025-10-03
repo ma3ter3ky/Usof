@@ -18,6 +18,7 @@ app.use(express.json({ limit: '1mb' }))
 app.use(pinoHttp({ logger }))
 
 app.use('/health', healthRouter)
+app.use('/seeds', express.static('seeds'))
 
 app.use(notFound)
 

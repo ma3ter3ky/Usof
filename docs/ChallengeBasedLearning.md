@@ -82,3 +82,13 @@
 - Observed internal Knex tables (`knex_migrations`, `knex_migrations_lock`) which track applied migrations and concurrency locks.
 
 **Result:** Stable, normalized DB schema ready for seeding; migrations/rollback run cleanly.
+
+### Act: Basic (Hour 7) — README test accounts + reset scripts
+
+- Documented seeded test accounts (admin + 4 users) with emails, usernames, passwords, and verification flags.
+- Noted avatar locations in `seeds/uploads/avatars` and how to expose them in dev if needed.
+- Added convenience scripts:
+  - `reset:dev` → rollback → migrate → seed (development DB)
+  - `reset:test` → same flow for the test DB (uses `.env.test`)
+
+**Result:** Faster local iteration; reviewers have clear credentials; data/files are reproducible.

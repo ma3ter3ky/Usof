@@ -19,7 +19,9 @@
     "db:rollback": "node --env-file=.env scripts/db-rollback.js",
     "db:seed": "node --env-file=.env scripts/db-seed.js",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "ci:check": "npm run lint && npm run test"
+    "ci:check": "npm run lint && npm run test",
+    "reset:dev": "npm run db:rollback && npm run db:migrate && npm run db:seed",
+    "reset:test": "NODE_ENV=test npm run db:rollback && NODE_ENV=test npm run db:migrate && NODE_ENV=test npm run db:seed"
   },
   "repository": {
     "type": "git",
@@ -33,6 +35,7 @@
   },
   "homepage": "https://github.com/ma3ter3ky/Usof#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",

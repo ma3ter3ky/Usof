@@ -11,6 +11,76 @@ servers:
   - url: https://usof.example.com/api
     description: Production
 
-paths: {}
-components:
-  schemas: {}
+paths:
+  /api/auth/register:
+    post:
+      summary: Register user and send verification email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, full_name, email, password]
+              properties:
+                login: { type: string, minLength: 3, maxLength: 32 }
+                full_name: { type: string, minLength: 1, maxLength: 128 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+      responses:
+        '201':
+          description: Created + verification email sent
+        '400': { description: Validation error }
+        '409': { description: Duplicate email/login }
+
+  /api/auth/verify:
+    get:
+      summary: Verify email by token
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Email verified }
+        '400': { description: Bad/expired token }
+        '404': { description: Token not found }
+
+  /api/auth/login:
+    post:
+      summary: Login (only verified users)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [login, password]
+                  properties:
+                    login: { type: string }
+                    password: { type: string }
+                - type: object
+                  required: [email, password]
+                  properties:
+                    email: { type: string, format: email }
+                    password: { type: string }
+      responses:
+        '200': { description: JWT tokens }
+        '401': { description: Invalid credentials }
+        '403': { description: Email not verified }
+
+  /api/auth/password-reset:
+    post:
+      summary: Request password reset (sends email if user exists)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: Always OK to avoid email enumeration }

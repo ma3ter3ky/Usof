@@ -92,3 +92,14 @@
   - `reset:test` → same flow for the test DB (uses `.env.test`)
 
 **Result:** Faster local iteration; reviewers have clear credentials; data/files are reproducible.
+
+### Act: Basic (Hour 8) — Auth: register, verify, login (verified only), reset request
+
+- Added Joi validation for register/login/reset endpoints.
+- Implemented registration with bcrypt hashing, verification token creation, and email delivery via Nodemailer (Ethereal in dev).
+- Implemented email verification endpoint; enforces verified-only login.
+- Implemented password reset request (token + email), confirmation deferred to Hour 9.
+- Issued JWT access/refresh tokens on successful login.
+- Updated OpenAPI spec with new auth endpoints and response codes.
+
+**Result:** Secure auth baseline with email proof-of-ownership; flows testable via Postman and Ethereal previews.

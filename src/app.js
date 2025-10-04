@@ -7,10 +7,10 @@ import { logger } from './logger.js'
 import healthRouter from './routes/health.js'
 import { notFound } from './middlewares/notFound.js'
 import { errorHandler } from './middlewares/errorHandler.js'
+import authRouter from './routes/auth.routes.js'
 
 const app = express()
 
-// базові мідлвари
 app.use(cors())
 app.use(helmet())
 app.use(compression())
@@ -19,6 +19,7 @@ app.use(pinoHttp({ logger }))
 
 app.use('/health', healthRouter)
 app.use('/seeds', express.static('seeds'))
+app.use('/api/auth', authRouter)
 
 app.use(notFound)
 

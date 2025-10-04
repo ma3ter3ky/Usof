@@ -9,11 +9,20 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+
   "extends": ["standard", "prettier"],
   "plugins": ["import", "n", "promise"],
   "rules": {
     "no-console": "off",
-    "import/no-unresolved": "error"
+    "import/no-unresolved": "error",
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "ignoreDestructuring": true,
+        "ignoreImports": true
+      }
+    ]
   },
   "ignorePatterns": ["node_modules/", "dist/", "coverage/", "uploads/"],
   "settings": {

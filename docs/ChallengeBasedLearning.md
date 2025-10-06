@@ -103,3 +103,12 @@
 - Updated OpenAPI spec with new auth endpoints and response codes.
 
 **Result:** Secure auth baseline with email proof-of-ownership; flows testable via Postman and Ethereal previews.
+
+### Act: Basic (Hour 9) — JWT sessions, refresh, logout, reset confirm, RBAC
+
+- Implemented access (short TTL) + refresh (httpOnly cookie) JWTs with `ver` claim.
+- Added `/api/auth/refresh` to rotate refresh and mint new access.
+- Added `/api/auth/logout` to bump `users.refresh_token_version` and clear cookie.
+- Added `/api/auth/password-reset/:token` to confirm password change (bcrypt).
+- Introduced `requireAuth` and `requireRole('admin')` middlewares.
+- Verified E2E via cURL: login → refresh → logout → refresh (401 invalidated).

@@ -8,6 +8,7 @@ import healthRouter from './routes/health.js'
 import { notFound } from './middlewares/notFound.js'
 import { errorHandler } from './middlewares/errorHandler.js'
 import authRouter from './routes/auth.routes.js'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 
@@ -16,6 +17,7 @@ app.use(helmet())
 app.use(compression())
 app.use(express.json({ limit: '1mb' }))
 app.use(pinoHttp({ logger }))
+app.use(cookieParser())
 
 app.use('/health', healthRouter)
 app.use('/seeds', express.static('seeds'))

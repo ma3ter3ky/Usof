@@ -25,5 +25,14 @@ export const userRepo = {
   async markEmailVerified(userId) {
     await db('users').where({ id: userId }).update({ email_verified: 1, updated_at: db.fn.now() })
     return this.findById(userId)
+  },
+  async incrementRefreshVersion(userId) {
+    await db('users').where({ id: userId }).increment('refresh_token_version', 1)
+  },
+
+  async updatePasswordHash(userId, passwordHash) {
+    await db('users')
+      .where({ id: userId })
+      .update({ password_hash: passwordHash, updated_at: db.fn.now() })
   }
 }

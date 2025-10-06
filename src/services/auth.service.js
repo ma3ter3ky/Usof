@@ -28,7 +28,7 @@ const resetReqSchema = Joi.object({
 })
 
 function signTokens(user) {
-  const payload = { sub: user.id, role: user.role }
+  const payload = { sub: user.id, role: user.role, ver: user.refresh_token_version }
   const access = jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_ACCESS_TTL || '900s'
   })
@@ -89,8 +89,8 @@ export const authService = {
     if (!match) throw unauthorized('Invalid credentials', 'INVALID_CREDENTIALS')
     if (!user.email_verified) throw forbidden('Email not verified', 'EMAIL_NOT_VERIFIED')
 
-    const tokens = signTokens(user)
-    return { userId: user.id, role: user.role, ...tokens }
+    const { access, refresh } = signTokens(user)
+    return { userId: user.id, role: user.role, access, refresh } // temp; will move cookie to controller
   },
 
   async requestPasswordReset(input) {
@@ -105,6 +105,73 @@ export const authService = {
       const link = `${APP_URL}/api/auth/password-reset/confirm?token=${encodeURIComponent(token)}`
       await sendResetEmail(user.email, link)
     }
+    return { ok: true }
+  },
+
+  async refresh(req) {
+    const cookie = req.cookies?.refresh_token
+    if (!cookie) throw unauthorized('Missing refresh cookie')
+
+    const payload = jwt.verify(cookie, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET)
+    const user = await userRepo.findById(payload.sub)
+    if (!user) throw unauthorized('Invalid refresh')
+    if (payload.ver !== user.refresh_token_version) {
+      throw unauthorized('Refresh invalidated')
+    }
+
+    const p = { sub: user.id, role: user.role, ver: user.refresh_token_version }
+    const access = jwt.sign(p, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_ACCESS_TTL || '900s'
+    })
+    const refresh = jwt.sign(p, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_REFRESH_TTL || '7d'
+    })
+
+    return { access, refresh }
+  },
+
+  async logout(req) {
+    const auth = req.headers.authorization || ''
+    let userId = null
+    try {
+      const [, token] = auth.split(' ')
+      if (token) {
+        const p = jwt.verify(token, process.env.JWT_SECRET)
+        userId = p.sub
+      }
+    } catch {
+      /* TEMP: ignore */
+    }
+
+    if (!userId) {
+      const cookie = req.cookies?.refresh_token
+      if (!cookie) return
+      try {
+        const p = jwt.verify(cookie, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET)
+        userId = p.sub
+      } catch {
+        return
+      }
+    }
+    if (userId) await userRepo.incrementRefreshVersion(userId)
+  },
+
+  async confirmPasswordReset(token, newPassword) {
+    if (!token) throw badRequest('Missing reset token')
+    if (!newPassword || newPassword.length < 8) {
+      throw badRequest('Password must be at least 8 chars')
+    }
+
+    const row = await resetTokenRepo.findByToken(token)
+    if (!row) throw badRequest('Reset token invalid or used', 'TOKEN_INVALID')
+    if (new Date(row.expires_at).getTime() < Date.now()) {
+      await resetTokenRepo.deleteById(row.id)
+      throw badRequest('Reset token expired', 'TOKEN_EXPIRED')
+    }
+
+    const hash = await bcrypt.hash(newPassword, 10)
+    await userRepo.updatePasswordHash(row.user_id, hash)
+    await resetTokenRepo.deleteById(row.id)
     return { ok: true }
   }
 }

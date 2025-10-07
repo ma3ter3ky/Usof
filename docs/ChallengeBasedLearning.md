@@ -121,3 +121,12 @@
 - Updated openapi.yaml, endpoints.md and cbl.md with access matrix & progress.
 - Refactored routing to per-path .route() style with explicit 405 handling.
 - Verified: unsupported methods now return clean 405 without global catch-all side effects.
+-
+
+### Act: Basic (Hour 11) — Users service/repo, validations, ACL
+
+- Implemented usersRepo (list/find/create/updateSelf/updateAdmin/delete) with pagination & sort.
+- Added usersService with Joi schemas; enforced self-only updates for profile fields; admin can manage role/emailVerified/rating.
+- Wired controller and routes; responses omit password_hash.
+- Added supertest scenarios for 401/403/200 and ownership.
+- Updated OpenAPI for users (list/get/create/update/delete/avatar).

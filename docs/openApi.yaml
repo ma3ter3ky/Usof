@@ -86,63 +86,87 @@ paths:
         '200': { description: Always OK to avoid email enumeration }
   /api/users:
     get:
-      summary: 'List users'
+      summary: 'List users (auth)'
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50 } }
+        - {
+            name: sort,
+            in: query,
+            schema: { type: string },
+            description: 'created_at:desc|asc, rating:desc|asc'
+          }
       responses:
         '200': { description: 'OK' }
+        '401': { description: 'Unauthorized' }
     post:
       summary: 'Create user (admin)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, full_name, email, password]
+              properties:
+                login: { type: string, minLength: 3, maxLength: 32 }
+                full_name: { type: string, minLength: 1, maxLength: 128 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                role: { type: string, enum: [user, admin] }
+                email_verified: { type: boolean }
       responses:
-        '501': { description: 'Not implemented' }
+        '201': { description: 'Created' }
+        '400': { description: 'Validation error' }
+        '403': { description: 'Forbidden' }
+
   /api/users/{id}:
     get:
-      summary: 'Get user'
+      summary: 'Get user (auth)'
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: 'OK'
-    patch:
-      summary: 'Update user'
-      responses:
-        '501':
-          description: 'Not implemented'
-    delete:
-      summary: 'Delete user (admin)'
-      responses:
-        '501':
-          description: 'Not implemented'
-  /api/categories:
-    get:
-      summary: 'List categories'
+          schema: { type: integer }
       responses:
         '200': { description: 'OK' }
-    post:
-      summary: 'Create category (admin)'
-      responses:
-        '501': { description: 'Not implemented' }
-  /api/categories/{id}:
-    get:
-      summary: 'Get category'
+        '401': { description: 'Unauthorized' }
+        '404': { description: 'Not found' }
+    patch:
+      summary: 'Update user (self or admin)'
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: integer
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 'Self: only full_name/profile_picture; Admin: full_name/role/email_verified/rating'
       responses:
-        '200':
-          description: 'OK'
-    patch:
-      summary: 'Update category (admin)'
-      responses:
-        '501':
-          description: 'Not implemented'
+        '200': { description: 'OK' }
+        '400': { description: 'Validation error' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden' }
+        '404': { description: 'Not found' }
     delete:
-      summary: 'Delete category (admin)'
+      summary: 'Delete user (admin)'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
       responses:
-        '501':
-          description: 'Not implemented'
+        '204': { description: 'No Content' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden' }
+        '404': { description: 'Not found' }
+
+  /api/users/avatar:
+    patch:
+      summary: 'Update avatar (auth)'
+      responses:
+        '501': { description: 'Not implemented' }

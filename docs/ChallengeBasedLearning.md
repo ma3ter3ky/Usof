@@ -119,3 +119,5 @@
 - Secured admin-only routes with requireAuth + requireRole('admin').
 - Mounted minimal AdminJS dashboard under `/admin` (role: admin only).
 - Updated openapi.yaml, endpoints.md and cbl.md with access matrix & progress.
+- Refactored routing to per-path .route() style with explicit 405 handling.
+- Verified: unsupported methods now return clean 405 without global catch-all side effects.

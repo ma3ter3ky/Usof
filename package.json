@@ -1,6 +1,9 @@
 {
   "name": "usof",
   "version": "1.0.0",
+  "engines": {
+    "node": "20.x"
+  },
   "description": "### Allowed stack",
   "main": "index.js",
   "directories": {
@@ -35,12 +38,15 @@
   },
   "homepage": "https://github.com/ma3ter3ky/Usof#readme",
   "dependencies": {
+    "@adminjs/express": "^6.1.1",
+    "adminjs": "^7.6.1",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "express-formidable": "^1.2.0",
     "helmet": "^8.1.0",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",

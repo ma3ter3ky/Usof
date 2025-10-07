@@ -112,3 +112,10 @@
 - Added `/api/auth/password-reset/:token` to confirm password change (bcrypt).
 - Introduced `requireAuth` and `requireRole('admin')` middlewares.
 - Verified E2E via cURL: login → refresh → logout → refresh (401 invalidated).
+
+### Act: Basic (Hour 10) — Users/Categories skeleton + AdminJS
+
+- Created placeholder REST endpoints for users & categories according to PDF spec.
+- Secured admin-only routes with requireAuth + requireRole('admin').
+- Mounted minimal AdminJS dashboard under `/admin` (role: admin only).
+- Updated openapi.yaml, endpoints.md and cbl.md with access matrix & progress.

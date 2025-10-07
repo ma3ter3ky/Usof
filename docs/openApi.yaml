@@ -84,3 +84,65 @@ paths:
                 email: { type: string, format: email }
       responses:
         '200': { description: Always OK to avoid email enumeration }
+  /api/users:
+    get:
+      summary: 'List users'
+      responses:
+        '200': { description: 'OK' }
+    post:
+      summary: 'Create user (admin)'
+      responses:
+        '501': { description: 'Not implemented' }
+  /api/users/{id}:
+    get:
+      summary: 'Get user'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'OK'
+    patch:
+      summary: 'Update user'
+      responses:
+        '501':
+          description: 'Not implemented'
+    delete:
+      summary: 'Delete user (admin)'
+      responses:
+        '501':
+          description: 'Not implemented'
+  /api/categories:
+    get:
+      summary: 'List categories'
+      responses:
+        '200': { description: 'OK' }
+    post:
+      summary: 'Create category (admin)'
+      responses:
+        '501': { description: 'Not implemented' }
+  /api/categories/{id}:
+    get:
+      summary: 'Get category'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'OK'
+    patch:
+      summary: 'Update category (admin)'
+      responses:
+        '501':
+          description: 'Not implemented'
+    delete:
+      summary: 'Delete category (admin)'
+      responses:
+        '501':
+          description: 'Not implemented'

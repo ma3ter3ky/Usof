@@ -4,24 +4,18 @@ import { methodNotAllowed } from '../middlewares/methodNotAllowed.js'
 
 const r = Router()
 
-r.post('/register', authController.register)
-r.all('/register', methodNotAllowed)
+r.route('/register').post(authController.register).all(methodNotAllowed)
 
-r.get('/verify', authController.verify)
-r.all('/verify', methodNotAllowed)
+r.route('/verify').get(authController.verify).all(methodNotAllowed)
 
-r.post('/login', authController.login)
-r.all('/login', methodNotAllowed)
+r.route('/login').post(authController.login).all(methodNotAllowed)
 
-r.post('/refresh', authController.refresh)
-r.all('/refresh', methodNotAllowed)
+r.route('/refresh').post(authController.refresh).all(methodNotAllowed)
 
-r.post('/logout', authController.logout)
-r.all('/logout', methodNotAllowed)
+r.route('/logout').post(authController.logout).all(methodNotAllowed)
 
-r.post('/password-reset', authController.requestReset)
-// confirm by path param (as per hour 9 requirement)
-r.post('/password-reset/:token', authController.confirmReset)
-/* r.all('/password-reset*', methodNotAllowed) */
+r.route('/password-reset').post(authController.requestReset).all(methodNotAllowed)
+
+r.route('/password-reset/:token').post(authController.confirmReset).all(methodNotAllowed)
 
 export default r

@@ -130,3 +130,11 @@
 - Wired controller and routes; responses omit password_hash.
 - Added supertest scenarios for 401/403/200 and ownership.
 - Updated OpenAPI for users (list/get/create/update/delete/avatar).
+
+### Act: Basic (Hour 12) — Categories CRUD + slugs + uniqueness
+
+- Implemented categories repo/service/controller with Joi validation.
+- Slug auto-generation; duplicate handling mapped to HTTP 409.
+- Public GET endpoints; admin-only POST/PATCH/DELETE with RBAC middlewares.
+- OpenAPI updated; Postman environment & requests added.
+- Verified MVC layering (routes → controllers → services → repositories).

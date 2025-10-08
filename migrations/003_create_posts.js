@@ -1,6 +1,6 @@
 export async function up(knex) {
   await knex.schema.createTable('posts', t => {
-    t.bigIncrements('id').primary()
+    t.increments('id').primary()
     t.bigInteger('author_id')
       .unsigned()
       .notNullable()

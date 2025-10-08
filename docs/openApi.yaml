@@ -170,3 +170,53 @@ paths:
       summary: 'Update avatar (auth)'
       responses:
         '501': { description: 'Not implemented' }
+
+  /api/categories:
+    get: { summary: 'List categories', responses: { '200': { description: 'OK' } } }
+    post:
+      summary: 'Create category (admin)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 3, maxLength: 64 }
+                slug: { type: string, description: 'optional; generated from name if missing' }
+      responses:
+        '201': { description: 'Created' }
+        '400': { description: 'Validation error' }
+        '403': { description: 'Forbidden' }
+        '409': { description: 'Duplicate name/slug' }
+  /api/categories/{id}:
+    get:
+      summary: 'Get category'
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: 'OK' }, '404': { description: 'Not found' } }
+    patch:
+      summary: 'Update category (admin)'
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, minLength: 3, maxLength: 64 }
+                slug: { type: string }
+      responses:
+        '200': { description: 'OK' }
+        '400': { description: 'Validation error' }
+        '403': { description: 'Forbidden' }
+        '404': { description: 'Not found' }
+        '409': { description: 'Duplicate name/slug' }
+    delete:
+      summary: 'Delete category (admin)'
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '204': { description: 'No Content' }
+        '403': { description: 'Forbidden' }
+        '404': { description: 'Not found' }

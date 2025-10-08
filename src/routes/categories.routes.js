@@ -1,24 +1,19 @@
 import { Router } from 'express'
 import { methodNotAllowed } from '../middlewares/methodNotAllowed.js'
 import { requireAuth, requireRole } from '../middlewares/auth.js'
+import { categoriesController } from '../controllers/categories.controller.js'
 
 const r = Router()
 
 r.route('/')
-  .get((_req, res) => res.json({ message: 'List categories - TBD' })) // public
-  .post(requireAuth, requireRole('admin'), (_req, res) =>
-    res.json({ message: 'Create category - TBD' })
-  )
+  .get(categoriesController.list)
+  .post(requireAuth, requireRole('admin'), categoriesController.create)
   .all(methodNotAllowed)
 
 r.route('/:id')
-  .get((_req, res) => res.json({ message: 'Get category - TBD' })) // public
-  .patch(requireAuth, requireRole('admin'), (_req, res) =>
-    res.json({ message: 'Update category - TBD' })
-  )
-  .delete(requireAuth, requireRole('admin'), (_req, res) =>
-    res.json({ message: 'Delete category - TBD' })
-  )
+  .get(categoriesController.get)
+  .patch(requireAuth, requireRole('admin'), categoriesController.update)
+  .delete(requireAuth, requireRole('admin'), categoriesController.remove)
   .all(methodNotAllowed)
 
 export default r

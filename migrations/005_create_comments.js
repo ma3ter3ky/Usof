@@ -1,7 +1,7 @@
 export async function up(knex) {
   await knex.schema.createTable('comments', t => {
-    t.bigIncrements('id').primary()
-    t.bigInteger('post_id')
+    t.increments('id').primary()
+    t.integer('post_id')
       .unsigned()
       .notNullable()
       .references('id')

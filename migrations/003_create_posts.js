@@ -8,7 +8,7 @@ export async function up(knex) {
       .inTable('users')
       .onDelete('CASCADE')
     t.string('title', 256).notNullable()
-    t.text('content', 'longtext').notNullable()
+    t.text('body', 'longtext').notNullable()
     t.enu('status', ['active', 'inactive'], { useNative: true, enumName: 'post_status' })
       .notNullable()
       .defaultTo('inactive')

@@ -7,13 +7,56 @@ import { postImagesRepo } from '../repositories/postImages.repo.js'
 const POSTS_DIR = path.join('uploads', 'posts')
 
 export const postsController = {
-  // TODO: ... other handlers later ...
+  async list(req, res, next) {
+    try {
+      const posts = await postsService.list(req.query)
+      res.json(posts)
+    } catch (e) {
+      next(e)
+    }
+  },
+
+  async get(req, res, next) {
+    try {
+      const post = await postsService.findById(Number(req.params.id))
+      res.json(post)
+    } catch (e) {
+      next(e)
+    }
+  },
+
+  async create(req, res, next) {
+    try {
+      const post = await postsService.create(req.user.id, req.body)
+      res.status(201).json(post)
+    } catch (e) {
+      next(e)
+    }
+  },
+
+  async patch(req, res, next) {
+    try {
+      const updated = await postsService.update(req.user, Number(req.params.id), req.body)
+      res.json(updated)
+    } catch (e) {
+      next(e)
+    }
+  },
+
+  async remove(req, res, next) {
+    try {
+      const r = await postsService.delete(req.user, Number(req.params.id))
+      res.json(r)
+    } catch (e) {
+      next(e)
+    }
+  },
 
   async uploadImage(req, res, next) {
     try {
       if (!req.user) throw badRequest('Unauthorized')
       const postId = Number(req.params.id)
-      const post = await postsService.assertExists(postId)
+      const post = await postsService.findById(postId)
 
       if (req.user.role !== 'admin' && req.user.id !== post.author_id) {
         throw forbidden('Not allowed to upload to this post')

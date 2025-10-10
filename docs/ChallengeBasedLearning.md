@@ -146,3 +146,10 @@
 - Implemented post images upload, persisted in post_images table; author/admin ACL.
 - Normalized server-generated filenames, avoided path traversal.
 - Updated OpenAPI and Postman test steps.
+
+### Act: Basic (Hour 14) — Posts CRUD with categories
+
+- Implemented repository/service/controller for posts with Joi validation and ownership guards.
+- Transactions handle post + category joins.
+- Routes: GET list/filter, GET by id, POST create, PATCH/DELETE for owner/admin.
+- Updated OpenAPI and Postman test coverage.

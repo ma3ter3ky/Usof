@@ -164,6 +164,56 @@ paths:
         '401': { description: 'Unauthorized' }
         '403': { description: 'Forbidden' }
         '404': { description: 'Not found' }
+  /api/posts:
+    get:
+      summary: 'List posts'
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, default: 10 } }
+        - { name: author_id, in: query, schema: { type: integer } }
+        - { name: category_id, in: query, schema: { type: integer } }
+        - {
+            name: order,
+            in: query,
+            schema:
+              { type: string, enum: [created_at:asc, created_at:desc, rating:asc, rating:desc] }
+          }
+      responses:
+        '200': { description: 'OK' }
+    post:
+      summary: 'Create post (auth)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, body]
+              properties:
+                title: { type: string, minLength: 3 }
+                body: { type: string, minLength: 1 }
+                categoryIds: { type: array, items: { type: integer } }
+      responses:
+        '201': { description: 'Created' }
+
+  /api/posts/{id}:
+    get:
+      summary: 'Get post by id'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: 'OK' }
+        '404': { description: 'Not Found' }
+    patch:
+      summary: 'Update post (owner or admin)'
+      responses:
+        '200': { description: 'Updated' }
+        '403': { description: 'Forbidden' }
+    delete:
+      summary: 'Delete post (owner or admin)'
+      responses:
+        '200': { description: 'Deleted' }
+        '403': { description: 'Forbidden' }
 
   /api/categories:
     get: { summary: 'List categories', responses: { '200': { description: 'OK' } } }

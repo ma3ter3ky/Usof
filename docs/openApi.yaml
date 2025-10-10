@@ -165,12 +165,6 @@ paths:
         '403': { description: 'Forbidden' }
         '404': { description: 'Not found' }
 
-  /api/users/avatar:
-    patch:
-      summary: 'Update avatar (auth)'
-      responses:
-        '501': { description: 'Not implemented' }
-
   /api/categories:
     get: { summary: 'List categories', responses: { '200': { description: 'OK' } } }
     post:
@@ -220,3 +214,44 @@ paths:
         '204': { description: 'No Content' }
         '403': { description: 'Forbidden' }
         '404': { description: 'Not found' }
+  /api/users/avatar:
+    patch:
+      summary: 'Upload user avatar (auth)'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 'PNG/JPEG/WEBP, max 2MB'
+      responses:
+        '200': { description: 'Avatar updated; returns { ok, path, user }' }
+        '400': { description: 'Validation error (size/type/missing)' }
+        '401': { description: 'Unauthorized' }
+
+  /api/posts/{id}/images:
+    post:
+      summary: 'Upload post image (author or admin)'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 'PNG/JPEG/WEBP, max 2MB'
+      responses:
+        '201': { description: 'Created; returns { ok, image }' }
+        '400': { description: 'Validation error' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden (not author/admin)' }
+        '404': { description: 'Post not found' }

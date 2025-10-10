@@ -2,13 +2,12 @@ import { Router } from 'express'
 import { methodNotAllowed } from '../middlewares/methodNotAllowed.js'
 import { requireAuth, requireRole } from '../middlewares/auth.js'
 import { usersController } from '../controllers/users.controller.js'
+import { formidableImage } from '../middlewares/formidableImage.js'
 
 const r = Router()
 
 r.route('/avatar')
-  .patch(requireAuth, (_req, res) =>
-    res.status(501).json({ message: 'Avatar upload handled in Hour 14' })
-  )
+  .patch(requireAuth, formidableImage(), usersController.uploadAvatar)
   .all(methodNotAllowed)
 
 r.route('/:id')

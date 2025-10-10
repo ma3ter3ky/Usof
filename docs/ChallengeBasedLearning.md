@@ -138,3 +138,11 @@
 - Public GET endpoints; admin-only POST/PATCH/DELETE with RBAC middlewares.
 - OpenAPI updated; Postman environment & requests added.
 - Verified MVC layering (routes → controllers → services → repositories).
+
+### Act: Basic (Hour 13) — Local uploads for avatars & post images
+
+- Added static serving for /uploads with safe headers and cache.
+- Implemented avatar upload via express-formidable with 2MB limit and PNG/JPEG/WEBP whitelist.
+- Implemented post images upload, persisted in post_images table; author/admin ACL.
+- Normalized server-generated filenames, avoided path traversal.
+- Updated OpenAPI and Postman test steps.

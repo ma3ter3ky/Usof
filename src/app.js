@@ -5,6 +5,8 @@ import compression from 'compression'
 import pinoHttp from 'pino-http'
 import { logger } from './logger.js'
 import cookieParser from 'cookie-parser'
+import path from 'node:path'
+import { existsSync, mkdirSync } from 'node:fs'
 
 import { notFound } from './middlewares/notFound.js'
 import { errorHandler } from './middlewares/errorHandler.js'
@@ -24,6 +26,27 @@ app.use(compression())
 app.use(express.json({ limit: '1mb' }))
 app.use(pinoHttp({ logger }))
 app.use(cookieParser())
+
+function ensureUploadDirs() {
+  const dirs = ['uploads', path.join('uploads', 'avatars'), path.join('uploads', 'posts')]
+  for (const d of dirs) {
+    if (!existsSync(d)) mkdirSync(d, { recursive: true })
+  }
+}
+ensureUploadDirs()
+
+app.use(
+  '/uploads',
+  express.static('uploads', {
+    dotfiles: 'ignore',
+    etag: true,
+    maxAge: '7d',
+    setHeaders: res => {
+      res.setHeader('X-Content-Type-Options', 'nosniff')
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable')
+    }
+  })
+)
 
 app.use('/seeds', express.static('seeds'))
 

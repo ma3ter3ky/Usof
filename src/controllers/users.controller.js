@@ -63,7 +63,6 @@ export const usersController = {
       const file = req.files?.image
       if (!file) throw badRequest('No file uploaded', 'NO_FILE')
 
-      console.log('\n\n\n', file.name, '\n\n\n')
       const ext = path.extname(file.name)
       if (!ext)
         throw badRequest(

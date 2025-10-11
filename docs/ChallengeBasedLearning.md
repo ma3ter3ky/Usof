@@ -153,3 +153,11 @@
 - Transactions handle post + category joins.
 - Routes: GET list/filter, GET by id, POST create, PATCH/DELETE for owner/admin.
 - Updated OpenAPI and Postman test coverage.
+
+### Act: Basic (Hour 15) — Threaded comments (replies)
+
+- Added parent_id, depth, path (materialized path) to comments.
+- Implemented reply creation with depth cap and hierarchical ordering by path.
+- List endpoint returns flat, tree-ordered array; simple to render and paginate.
+- Ownership and validation preserved (max 5000 chars).
+- OpenAPI and seeds updated.

@@ -13,7 +13,7 @@ export async function up(knex) {
       .references('id')
       .inTable('users')
       .onDelete('CASCADE')
-    t.text('content', 'longtext').notNullable()
+    t.text('body', 'longtext').notNullable()
     t.enu('status', ['active', 'inactive'], { useNative: true, enumName: 'comment_status' })
       .notNullable()
       .defaultTo('active')

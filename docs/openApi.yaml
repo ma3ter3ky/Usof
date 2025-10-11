@@ -305,3 +305,48 @@ paths:
         '401': { description: 'Unauthorized' }
         '403': { description: 'Forbidden (not author/admin)' }
         '404': { description: 'Post not found' }
+  /api/posts/{postId}/comments:
+    get:
+      summary: 'List comments (tree-ordered)'
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: 'OK (flat array ordered by path)' }
+    post:
+      summary: 'Create comment (auth), optional reply'
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 5000 }
+                parent_id: { type: integer, description: 'Optional parent comment id' }
+      responses:
+        '201': { description: 'Created' }
+        '400': { description: 'Validation or depth limit' }
+        '404': { description: 'Post not found' }
+
+  /api/comments/{id}:
+    patch:
+      summary: 'Update comment (owner/admin)'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: 'Updated' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden' }
+        '404': { description: 'Not found' }
+    delete:
+      summary: 'Delete comment (owner/admin)'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200': { description: 'Deleted' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden' }
+        '404': { description: 'Not found' }

@@ -10,6 +10,7 @@ import { existsSync, mkdirSync } from 'node:fs'
 
 import { notFound } from './middlewares/notFound.js'
 import { errorHandler } from './middlewares/errorHandler.js'
+import { authLimiter, writeLimiter } from './middlewares/rateLimit.js'
 
 import { mountAdmin } from './admin/index.js'
 
@@ -36,6 +37,7 @@ function ensureUploadDirs() {
     if (!existsSync(d)) mkdirSync(d, { recursive: true })
   }
 }
+
 ensureUploadDirs()
 
 app.use(
@@ -52,6 +54,11 @@ app.use(
 )
 
 app.use('/seeds', express.static('seeds'))
+
+app.use('/api/auth/login', authLimiter)
+app.use('/api/auth/password-reset', authLimiter)
+app.use('/api/auth/verify/resend', authLimiter)
+app.use(['/api/posts', '/api/comments'], writeLimiter)
 
 app.use('/health', healthRouter)
 app.use('/api/auth', authRouter)

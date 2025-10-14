@@ -65,5 +65,15 @@ export const authController = {
     } catch (e) {
       next(e)
     }
+  },
+
+  resendVerify: async (req, res, next) => {
+    try {
+      const out = await authService.resendVerify(req.body)
+      if (out?.preview) res.set('X-Preview-URL', out.preview)
+      res.status(200).json({ ok: true })
+    } catch (e) {
+      next(e)
+    }
   }
 }

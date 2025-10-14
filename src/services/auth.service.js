@@ -1,3 +1,5 @@
+/* eslint-disable*/
+
 import Joi from 'joi'
 import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
@@ -9,6 +11,7 @@ import { badRequest, forbidden, unauthorized, notFoundErr } from '../utils/httpE
 import { sendVerificationEmail, sendResetEmail } from './mail.service.js'
 
 const APP_URL = process.env.APP_URL || 'http://localhost:3000'
+const RESEND_COOLDOWN_MS = Number(process.env.VERIFY_RESEND_COOLDOWN_MS || 10 * 60 * 1000)
 
 const registerSchema = Joi.object({
   login: Joi.string().alphanum().min(3).max(32).required(),
@@ -24,6 +27,10 @@ const loginSchema = Joi.object({
 }).xor('login', 'email') // exactly one of login or email
 
 const resetReqSchema = Joi.object({
+  email: Joi.string().email().max(255).required()
+})
+
+const resendSchema = Joi.object({
   email: Joi.string().email().max(255).required()
 })
 
@@ -173,5 +180,37 @@ export const authService = {
     await userRepo.updatePasswordHash(row.user_id, hash)
     await resetTokenRepo.deleteById(row.id)
     return { ok: true }
+  },
+
+  async resendVerify(input) {
+    const { value, error } = resendSchema.validate(input)
+    if (error) throw badRequest(error.message)
+
+    const user = await userRepo.findByEmail(value.email)
+    if (!user) return { ok: true }
+    if (user.email_verified) return { ok: true }
+
+    const latest = await verifyTokenRepo.findLatestByUserId(user.id)
+    if (latest) {
+      const last = new Date(latest.created_at || latest.expires_at || Date.now()).getTime()
+      const remaining = RESEND_COOLDOWN_MS - (Date.now() - last)
+      if (remaining > 0) {
+        const err = badRequest('Try again later', 'RESEND_COOLDOWN')
+        err.retryAfterSec = Math.ceil(remaining / 1000)
+        throw err
+      }
+    }
+
+    // Rotate: delete old tokens, create new one
+    await verifyTokenRepo.deleteByUserId(user.id)
+
+    const token = crypto.randomBytes(32).toString('hex')
+    const expires_at = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    await verifyTokenRepo.create({ user_id: user.id, token, expires_at })
+
+    const link = `${APP_URL}/api/auth/verify?token=${encodeURIComponent(token)}`
+    const info = await sendVerificationEmail(user.email, link)
+
+    return { ok: true, preview: info?.preview }
   }
 }

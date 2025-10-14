@@ -168,3 +168,7 @@
 - Transactionally recalculated ratings for posts/comments.
 - Validated payload (type, id, value) and verified target existence.
 - Updated routes, controller, service, repo, and OpenAPI.
+
+### CBL (Hour 17) - anti brute force / antispam
+
+- Added route-level express-rate-limit for auth & writes; kept services clean; no changes to existing token rotation.

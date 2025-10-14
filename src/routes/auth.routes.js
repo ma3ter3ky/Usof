@@ -6,6 +6,7 @@ const r = Router()
 
 r.route('/register').post(authController.register).all(methodNotAllowed)
 
+r.route('/verify/resend').post(authController.resendVerify).all(methodNotAllowed)
 r.route('/verify').get(authController.verify).all(methodNotAllowed)
 
 r.route('/login').post(authController.login).all(methodNotAllowed)

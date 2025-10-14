@@ -19,6 +19,7 @@ import usersRouter from './routes/users.routes.js'
 import categoriesRouter from './routes/categories.routes.js'
 import postsRouter from './routes/posts.routes.js'
 import commentsRouter from './routes/comments.routes.js'
+import likesRouter from './routes/likes.routes.js'
 
 const app = express()
 
@@ -58,6 +59,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/categories', categoriesRouter)
 app.use('/api/posts', postsRouter)
 app.use('/api', commentsRouter)
+app.use('/api', likesRouter)
 
 mountAdmin(app)
 

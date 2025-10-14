@@ -1,30 +1,45 @@
 export async function up(knex) {
+  const has = await knex.schema.hasTable('likes')
+  if (has) return
+
+  const { database } = knex.client.config.connection
+  const col = await knex('information_schema.COLUMNS')
+    .select('DATA_TYPE', 'COLUMN_TYPE')
+    .where({
+      TABLE_SCHEMA: database,
+      TABLE_NAME: 'users',
+      COLUMN_NAME: 'id'
+    })
+    .first()
+
+  const usersIdIsBigInt = col?.DATA_TYPE?.toLowerCase() === 'bigint'
+  const addAuthorId = t => {
+    if (usersIdIsBigInt) t.bigInteger('author_id').unsigned().notNullable()
+    else t.integer('author_id').unsigned().notNullable()
+  }
+
   await knex.schema.createTable('likes', t => {
     t.increments('id').primary()
-    t.integer('post_id').unsigned().nullable().references('id').inTable('posts').onDelete('CASCADE')
-    t.bigInteger('author_id')
-      .unsigned()
-      .notNullable()
-      .references('id')
-      .inTable('users')
-      .onDelete('CASCADE')
-    t.integer('comment_id')
-      .unsigned()
-      .nullable()
-      .references('id')
-      .inTable('comments')
-      .onDelete('CASCADE')
-    t.enu('value', ['like', 'dislike'], { useNative: true, enumName: 'like_value' })
-      .notNullable()
-      .defaultTo('like')
-    t.dateTime('created_at').notNullable().defaultTo(knex.fn.now())
 
-    t.unique(['author_id', 'post_id'], 'uq_like_author_post')
-    t.unique(['author_id', 'comment_id'], 'uq_like_author_comment')
+    addAuthorId(t)
 
-    t.check('((post_id IS NOT NULL) XOR (comment_id IS NOT NULL))', [], 'chk_like_target')
+    t.enum('target_type', ['post', 'comment']).notNullable()
+    t.integer('target_id').unsigned().notNullable()
+
+    t.integer('value').notNullable()
+
+    t.timestamp('created_at').defaultTo(knex.fn.now())
+    t.timestamp('updated_at').defaultTo(knex.fn.now())
+
+    t.unique(['author_id', 'target_type', 'target_id'], 'uniq_like_per_target')
+    t.index(['target_type', 'target_id'], 'idx_like_target')
+  })
+
+  await knex.schema.alterTable('likes', t => {
+    t.foreign('author_id').references('id').inTable('users').onDelete('CASCADE')
   })
 }
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists('likes')
 }

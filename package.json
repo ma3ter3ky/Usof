@@ -21,6 +21,7 @@
     "db:migrate": "node --env-file=.env scripts/db-migrate.js",
     "db:rollback": "node --env-file=.env scripts/db-rollback.js",
     "db:seed": "node --env-file=.env scripts/db-seed.js",
+    "db:recount": "node --env-file=.env scripts/db-recount.js",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "ci:check": "npm run lint && npm run test",
     "reset:dev": "npm run db:rollback && npm run db:migrate && npm run db:seed",

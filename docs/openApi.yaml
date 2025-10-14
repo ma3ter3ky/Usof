@@ -350,3 +350,38 @@ paths:
         '401': { description: 'Unauthorized' }
         '403': { description: 'Forbidden' }
         '404': { description: 'Not found' }
+  /api/likes:
+    post:
+      summary: 'Upsert like/dislike for post or comment'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_type, target_id, value]
+              properties:
+                target_type: { type: string, enum: [post, comment] }
+                target_id: { type: integer }
+                value: { type: integer, enum: [-1, 1] }
+      responses:
+        '200': { description: 'Created/Updated/Unchanged' }
+        '400': { description: 'Validation error' }
+        '401': { description: 'Unauthorized' }
+        '404': { description: 'Target not found' }
+
+    delete:
+      summary: 'Remove like/dislike'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_type, target_id]
+              properties:
+                target_type: { type: string, enum: [post, comment] }
+                target_id: { type: integer }
+      responses:
+        '200': { description: 'Removed (idempotent)' }
+        '401': { description: 'Unauthorized' }

@@ -161,3 +161,10 @@
 - List endpoint returns flat, tree-ordered array; simple to render and paginate.
 - Ownership and validation preserved (max 5000 chars).
 - OpenAPI and seeds updated.
+
+### Act: Basic (Hour 16) — Likes/Reactions
+
+- Added likes upsert/delete with per-user-per-target uniqueness.
+- Transactionally recalculated ratings for posts/comments.
+- Validated payload (type, id, value) and verified target existence.
+- Updated routes, controller, service, repo, and OpenAPI.

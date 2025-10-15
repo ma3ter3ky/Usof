@@ -14,6 +14,10 @@ const updateSchema = Joi.object({
   body: Joi.string().min(1).max(5000).required()
 })
 
+const statusSchema = Joi.object({
+  status: Joi.string().valid('active', 'inactive').required()
+})
+
 export const commentsService = {
   async listByPostTree(postId) {
     const postIdNumber = Number(postId)
@@ -60,6 +64,19 @@ export const commentsService = {
     const { value, error } = updateSchema.validate(input)
     if (error) throw badRequest(error.message)
     return commentsRepo.update(cid, { body: value.body })
+  },
+
+  async setStatus(user, id, input) {
+    if (user.role !== 'admin') throw forbidden('Only admins can change comment status')
+
+    const cid = Number(id)
+    const existing = await commentsRepo.findById(cid)
+    if (!existing) throw notFoundErr('Comment not found')
+
+    const { value, error } = statusSchema.validate(input)
+    if (error) throw badRequest(error.message)
+
+    return commentsRepo.setStatus(cid, value.status)
   },
 
   async delete(user, id) {

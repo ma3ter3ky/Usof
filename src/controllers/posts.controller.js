@@ -43,6 +43,15 @@ export const postsController = {
     }
   },
 
+  async setStatus(req, res, next) {
+    try {
+      const updated = await postsService.setStatus(req.user, Number(req.params.id), req.body)
+      res.json(updated)
+    } catch (e) {
+      next(e)
+    }
+  },
+
   async remove(req, res, next) {
     try {
       const r = await postsService.delete(req.user, Number(req.params.id))

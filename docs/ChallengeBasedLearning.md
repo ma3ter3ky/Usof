@@ -172,3 +172,9 @@
 ### CBL (Hour 17) - anti brute force / antispam
 
 - Added route-level express-rate-limit for auth & writes; kept services clean; no changes to existing token rotation.
+
+### Act: Basic (Hour 18) — Admin moderation toggles
+
+- Implemented admin-only `/api/posts/{id}/status` and `/api/comments/{id}/status` endpoints to flip visibility without editing content.
+- Persisted comment status in repository lookups so moderation feedback propagates to clients.
+- Updated OpenAPI contract and added `docs/admin-moderation.md` with spec/testing workflow (includes `npm test -- --runTestsByPath tests/admin.moderation.test.js`).

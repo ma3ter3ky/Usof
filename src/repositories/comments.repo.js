@@ -12,7 +12,7 @@ export const commentsRepo = {
     const l = Math.min(Number(limit) || 10, 50)
     const p = Math.max(Number(page) || 1, 1)
     return db('comments')
-      .select('id', 'post_id', 'author_id', 'body', 'created_at', 'updated_at')
+      .select('id', 'post_id', 'author_id', 'body', 'status', 'created_at', 'updated_at')
       .where({ post_id: postId })
       .orderBy('id', 'asc')
       .limit(l)
@@ -27,6 +27,7 @@ export const commentsRepo = {
         'parent_id',
         'author_id',
         'body',
+        'status',
         'depth',
         'path',
         'created_at',
@@ -47,6 +48,7 @@ export const commentsRepo = {
         'parent_id',
         'author_id',
         'body',
+        'status',
         'depth',
         'path',
         'created_at',
@@ -79,6 +81,11 @@ export const commentsRepo = {
 
   async update(id, { body }) {
     await db('comments').where({ id }).update({ body, updated_at: db.fn.now() })
+    return this.findById(id)
+  },
+
+  async setStatus(id, status) {
+    await db('comments').where({ id }).update({ status, updated_at: db.fn.now() })
     return this.findById(id)
   },
 

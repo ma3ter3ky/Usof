@@ -14,6 +14,10 @@ const updateSchema = Joi.object({
   categoryIds: Joi.array().items(Joi.number().integer())
 }).or('title', 'body', 'categoryIds')
 
+const statusSchema = Joi.object({
+  status: Joi.string().valid('active', 'inactive').required()
+})
+
 export const postsService = {
   async list(params) {
     return postsRepo.list(params)
@@ -52,5 +56,17 @@ export const postsService = {
     }
     await postsRepo.delete(id)
     return { ok: true }
+  },
+
+  async setStatus(user, id, input) {
+    if (user.role !== 'admin') throw forbidden('Only admins can change post status')
+
+    const post = await postsRepo.findById(id)
+    if (!post) throw notFoundErr('Post not found')
+
+    const { value, error } = statusSchema.validate(input)
+    if (error) throw badRequest(error.message)
+
+    return postsRepo.update(id, { status: value.status })
   }
 }

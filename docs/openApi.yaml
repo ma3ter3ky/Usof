@@ -214,6 +214,27 @@ paths:
       responses:
         '200': { description: 'Deleted' }
         '403': { description: 'Forbidden' }
+  /api/posts/{id}/status:
+    patch:
+      summary: 'Set post status (admin)'
+      description: 'Toggle a post between active and inactive without modifying its content.'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [active, inactive] }
+      responses:
+        '200': { description: 'Status updated' }
+        '400': { description: 'Validation error' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden (admin only)' }
+        '404': { description: 'Post not found' }
 
   /api/categories:
     get: { summary: 'List categories', responses: { '200': { description: 'OK' } } }
@@ -350,6 +371,28 @@ paths:
         '401': { description: 'Unauthorized' }
         '403': { description: 'Forbidden' }
         '404': { description: 'Not found' }
+
+  /api/comments/{id}/status:
+    patch:
+      summary: 'Set comment status (admin)'
+      description: 'Activate or hide a comment without editing its content.'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [active, inactive] }
+      responses:
+        '200': { description: 'Status updated' }
+        '400': { description: 'Validation error' }
+        '401': { description: 'Unauthorized' }
+        '403': { description: 'Forbidden (admin only)' }
+        '404': { description: 'Comment not found' }
   /api/likes:
     post:
       summary: 'Upsert like/dislike for post or comment'

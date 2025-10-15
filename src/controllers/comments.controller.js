@@ -28,6 +28,15 @@ export const commentsController = {
     }
   },
 
+  async setStatus(req, res, next) {
+    try {
+      const row = await commentsService.setStatus(req.user, req.params.id, req.body)
+      res.json(row)
+    } catch (e) {
+      next(e)
+    }
+  },
+
   async remove(req, res, next) {
     try {
       const r = await commentsService.delete(req.user, req.params.id)

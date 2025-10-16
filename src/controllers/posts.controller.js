@@ -65,7 +65,7 @@ export const postsController = {
     try {
       if (!req.user) throw badRequest('Unauthorized')
       const postId = Number(req.params.id)
-      const post = await postsService.findById(postId)
+      const post = await postsService.findById(postId, req.user)
 
       if (req.user.role !== 'admin' && req.user.id !== post.author_id) {
         throw forbidden('Not allowed to upload to this post')

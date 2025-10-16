@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth, requireRole } from '../middlewares/auth.js'
+import { optionalAuth, requireAuth, requireRole } from '../middlewares/auth.js'
 import { methodNotAllowed } from '../middlewares/methodNotAllowed.js'
 import { formidableImage } from '../middlewares/formidableImage.js'
 import { postsController } from '../controllers/posts.controller.js'
@@ -15,13 +15,13 @@ r.route('/:id/images')
   .all(methodNotAllowed)
 
 r.route('/:id')
-  .get(postsController.get)
+  .get(optionalAuth, postsController.get)
   .patch(requireAuth, postsController.patch)
   .delete(requireAuth, postsController.remove)
   .all(methodNotAllowed)
 
 r.route('/')
-  .get(postsController.list)
+  .get(optionalAuth, postsController.list)
   .post(requireAuth, postsController.create)
   .all(methodNotAllowed)
 

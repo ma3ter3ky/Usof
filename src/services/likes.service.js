@@ -26,7 +26,7 @@ export const likesService = {
     const { target_type, target_id } = value
 
     if (target_type === 'post') {
-      await postsService.findById(target_id)
+      await postsService.findById(target_id, user)
     } else {
       const c = await commentsRepo.findById(target_id)
       if (!c) throw notFoundErr('Comment not found')

@@ -15,23 +15,49 @@ export const postsRepo = {
   async list({
     page = 1,
     limit = 10,
-    author_id: authorId,
-    category_id: categoryId,
-    order = 'created_at:desc'
+    authorId,
+    categories,
+    statuses,
+    dateFrom,
+    dateTo,
+    sortBy = 'created_at',
+    sortDir = 'desc'
   }) {
-    const q = db('posts')
-      .select('posts.*')
-      .leftJoin('users', 'users.id', 'posts.author_id')
-      .modify(query => {
-        if (authorId) query.where('author_id', authorId)
-        if (categoryId) {
-          query.join('post_categories', 'post_categories.post_id', 'posts.id')
-          query.where('post_categories.category_id', categoryId)
-        }
+    const safeLimit = Math.min(Number(limit) || 10, 100)
+    const safePage = Math.max(Number(page) || 1, 1)
+
+    const q = db('posts as p').select('p.*')
+
+    if (authorId) {
+      q.where('p.author_id', authorId)
+    }
+
+    if (Array.isArray(categories) && categories.length) {
+      q.whereExists(function () {
+        this.select(1)
+          .from('post_categories as pc')
+          .whereRaw('pc.post_id = p.id')
+          .whereIn('pc.category_id', categories)
       })
-    const [col, dir] = order.split(':')
-    if (col) q.orderBy(col, dir === 'asc' ? 'asc' : 'desc')
-    return q.limit(limit).offset((page - 1) * limit)
+    }
+
+    if (Array.isArray(statuses) && statuses.length) {
+      q.whereIn('p.status', statuses)
+    }
+
+    if (dateFrom) {
+      q.where('p.created_at', '>=', dateFrom)
+    }
+
+    if (dateTo) {
+      q.where('p.created_at', '<=', dateTo)
+    }
+
+    const direction = sortDir === 'asc' ? 'asc' : 'desc'
+    const orderColumn = sortBy === 'rating' ? 'p.rating' : 'p.created_at'
+    q.orderBy(orderColumn, direction).orderBy('p.id', 'desc')
+
+    return q.limit(safeLimit).offset((safePage - 1) * safeLimit)
   },
 
   async findById(id) {

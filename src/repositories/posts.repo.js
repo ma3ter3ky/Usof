@@ -55,9 +55,29 @@ export const postsRepo = {
 
     const direction = sortDir === 'asc' ? 'asc' : 'desc'
     const orderColumn = sortBy === 'rating' ? 'p.rating' : 'p.created_at'
-    q.orderBy(orderColumn, direction).orderBy('p.id', 'desc')
+    q.orderBy(orderColumn, direction).orderBy('p.id', direction)
 
-    return q.limit(safeLimit).offset((safePage - 1) * safeLimit)
+    const posts = await q.limit(safeLimit).offset((safePage - 1) * safeLimit)
+    if (!posts.length) return []
+
+    const postIds = posts.map(post => post.id)
+    const categoriesRows = await db('post_categories as pc')
+      .join('categories as c', 'c.id', 'pc.category_id')
+      .whereIn('pc.post_id', postIds)
+      .select('pc.post_id as postId', 'c.id', 'c.name', 'c.slug')
+
+    const categoriesByPost = categoriesRows.reduce((acc, row) => {
+      if (!acc.has(row.postId)) {
+        acc.set(row.postId, [])
+      }
+      acc.get(row.postId).push({ id: row.id, name: row.name, slug: row.slug })
+      return acc
+    }, new Map())
+
+    return posts.map(post => ({
+      ...post,
+      categories: categoriesByPost.get(post.id) ?? []
+    }))
   },
 
   async findById(id) {

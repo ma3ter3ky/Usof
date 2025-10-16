@@ -9,7 +9,7 @@ const POSTS_DIR = path.join('uploads', 'posts')
 export const postsController = {
   async list(req, res, next) {
     try {
-      const posts = await postsService.list(req.query)
+      const posts = await postsService.list(req.user, req.query)
       res.json(posts)
     } catch (e) {
       next(e)

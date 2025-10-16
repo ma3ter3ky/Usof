@@ -168,15 +168,65 @@ paths:
     get:
       summary: 'List posts'
       parameters:
-        - { name: page, in: query, schema: { type: integer, default: 1 } }
-        - { name: limit, in: query, schema: { type: integer, default: 10 } }
-        - { name: author_id, in: query, schema: { type: integer } }
-        - { name: category_id, in: query, schema: { type: integer } }
+        - {
+            name: page,
+            in: query,
+            schema: { type: integer, default: 1 },
+            description: '1-indexed page number'
+          }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, default: 10 },
+            description: 'Items per page (max 100)'
+          }
+        - {
+            name: author_id,
+            in: query,
+            schema: { type: integer },
+            description: 'Filter posts created by a specific author'
+          }
+        - {
+            name: categories,
+            in: query,
+            schema: { type: string },
+            description: 'Comma separated list of category ids to match (any match)'
+          }
+        - {
+            name: statuses,
+            in: query,
+            schema: { type: string },
+            description: 'Comma separated list of statuses. Non-admins may only request active.'
+          }
+        - {
+            name: from,
+            in: query,
+            schema: { type: string, format: date-time },
+            description: 'Lower bound (inclusive) for created_at timestamp'
+          }
+        - {
+            name: to,
+            in: query,
+            schema: { type: string, format: date-time },
+            description: 'Upper bound (inclusive) for created_at timestamp'
+          }
+        - {
+            name: sort,
+            in: query,
+            schema: { type: string, enum: [date, likes], default: date },
+            description: 'Sort by newest first or by rating. "likes" sorts by rating with newest ties first.'
+          }
+        - {
+            name: direction,
+            in: query,
+            schema: { type: string, enum: [asc, desc], default: desc },
+            description: 'Ascending or descending order for the selected sort column'
+          }
         - {
             name: order,
             in: query,
-            schema:
-              { type: string, enum: [created_at:asc, created_at:desc, rating:asc, rating:desc] }
+            schema: { type: string },
+            description: 'Legacy alias using format column:direction (e.g. rating:desc).'
           }
       responses:
         '200': { description: 'OK' }

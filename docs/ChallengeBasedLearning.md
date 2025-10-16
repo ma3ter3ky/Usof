@@ -178,3 +178,8 @@
 - Implemented admin-only `/api/posts/{id}/status` and `/api/comments/{id}/status` endpoints to flip visibility without editing content.
 - Persisted comment status in repository lookups so moderation feedback propagates to clients.
 - Updated OpenAPI contract and added `docs/admin-moderation.md` with spec/testing workflow (includes `npm test -- --runTestsByPath tests/admin.moderation.test.js`).
+
+### Act: Basic (Hour 19) - Fixing small issues, adding filtering and sorting
+
+- Added sorting by different parameters: likes, categories, timestamps etc.
+- Fixed: when listing posts - now returns list of categories with each post

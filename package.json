@@ -40,7 +40,8 @@
   "homepage": "https://github.com/ma3ter3ky/Usof#readme",
   "dependencies": {
     "@adminjs/express": "^6.1.1",
-    "adminjs": "^7.6.1",
+    "@adminjs/sql": "^2.2.6",
+    "adminjs": "^7.8.17",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",

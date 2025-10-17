@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -40,6 +42,40 @@ function ensureUploadDirs() {
 
 ensureUploadDirs()
 
+import AdminJS from 'adminjs'
+import Plugin from '@adminjs/express'
+import { Adapter, Database, Resource } from '@adminjs/sql'
+import makeUserResource from './admin/resources/userResource.js'
+
+AdminJS.registerAdapter({
+  Database,
+  Resource
+})
+
+const database = await new Adapter('mysql2', {
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+}).init()
+
+const admin = new AdminJS({
+  resources: [
+    makeUserResource(database), // users
+    { resource: database.table('posts') },
+    { resource: database.table('categories') },
+    { resource: database.table('comments') },
+    { resource: database.table('likes') },
+    { resource: database.table('password_reset_tokens') },
+    { resource: database.table('email_verification_tokens') }
+  ]
+})
+
+admin.watch()
+const router = Plugin.buildRouter(admin)
+app.use(admin.options.rootPath, router)
+
 app.use(
   '/uploads',
   express.static('uploads', {
@@ -68,7 +104,7 @@ app.use('/api/posts', postsRouter)
 app.use('/api', commentsRouter)
 app.use('/api', likesRouter)
 
-mountAdmin(app)
+/*await mountAdmin(app)*/
 
 app.use(notFound)
 app.use(errorHandler)

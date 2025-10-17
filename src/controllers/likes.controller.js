@@ -16,5 +16,23 @@ export const likesController = {
     } catch (e) {
       next(e)
     }
+  },
+
+  async listPostLikes(req, res, next) {
+    try {
+      const likes = await likesService.listPostLikes(req.user, req.params.post_id)
+      res.json(likes)
+    } catch (e) {
+      next(e)
+    }
+  },
+
+  async listCommentLikes(req, res, next) {
+    try {
+      const likes = await likesService.listCommentLikes(req.params.comment_id)
+      res.json(likes)
+    } catch (e) {
+      next(e)
+    }
   }
 }

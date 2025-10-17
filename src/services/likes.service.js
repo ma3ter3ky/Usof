@@ -18,6 +18,14 @@ const removeSchema = Joi.object({
   target_id: Joi.number().integer().min(1).required()
 })
 
+const targetIdSchema = Joi.number().integer().min(1).required()
+
+function parseTargetId(rawId, label) {
+  const { value, error } = targetIdSchema.label(label).validate(rawId)
+  if (error) throw badRequest(error.message)
+  return value
+}
+
 export const likesService = {
   async upsert(user, input) {
     const { value, error } = upsertSchema.validate(input)
@@ -99,5 +107,22 @@ export const likesService = {
 
       return { ok: true, deleted }
     })
+  },
+
+  async listPostLikes(user, postId) {
+    const pid = parseTargetId(postId, 'post_id')
+
+    await postsService.findById(pid, user)
+
+    return likesRepo.listByTarget('post', pid)
+  },
+
+  async listCommentLikes(commentId) {
+    const cid = parseTargetId(commentId, 'comment_id')
+
+    const existing = await commentsRepo.findById(cid)
+    if (!existing) throw notFoundErr('Comment not found')
+
+    return likesRepo.listByTarget('comment', cid)
   }
 }

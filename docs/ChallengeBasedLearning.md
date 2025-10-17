@@ -183,3 +183,9 @@
 
 - Added sorting by different parameters: likes, categories, timestamps etc.
 - Fixed: when listing posts - now returns list of categories with each post
+
+### Act: Basic (Hour 20) — Documented likes auditing endpoints
+
+- Logged the addition of admin-only `GET /api/posts/:post_id/like` and `GET /api/comments/:comment_id/like`.
+- Extended `docs/endpoints.md` with auth requirements and error cases.
+- Published Postman collection `docs/postman/likes-admin.postman_collection.json` for quick verification.

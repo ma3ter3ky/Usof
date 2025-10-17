@@ -9,6 +9,13 @@ export const likesRepo = {
       .first()
   },
 
+  async listByTarget(type, targetId) {
+    return db('likes')
+      .select('id', 'author_id', 'target_type', 'target_id', 'value', 'created_at', 'updated_at')
+      .where({ target_type: type, target_id: targetId })
+      .orderBy('created_at', 'asc')
+  },
+
   async insert(trx, { author_id, target_type, target_id, value }) {
     const [id] = await trx('likes').insert({ author_id, target_type, target_id, value })
     return id

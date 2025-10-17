@@ -2,7 +2,6 @@
 
 import express from 'express'
 import cors from 'cors'
-import helmet from 'helmet'
 import compression from 'compression'
 import pinoHttp from 'pino-http'
 import { logger } from './logger.js'
@@ -13,8 +12,7 @@ import { existsSync, mkdirSync } from 'node:fs'
 import { notFound } from './middlewares/notFound.js'
 import { errorHandler } from './middlewares/errorHandler.js'
 import { authLimiter, writeLimiter } from './middlewares/rateLimit.js'
-
-import { mountAdmin } from './admin/index.js'
+import { requireAuth, requireRole } from './middlewares/auth.js'
 
 import healthRouter from './routes/health.js'
 import authRouter from './routes/auth.routes.js'
@@ -27,7 +25,6 @@ import likesRouter from './routes/likes.routes.js'
 const app = express()
 
 app.use(cors())
-app.use(helmet())
 app.use(compression())
 app.use(express.json({ limit: '1mb' }))
 app.use(pinoHttp({ logger }))
@@ -43,14 +40,11 @@ function ensureUploadDirs() {
 ensureUploadDirs()
 
 import AdminJS from 'adminjs'
-import Plugin from '@adminjs/express'
+import * as AdminJSExpress from '@adminjs/express'
 import { Adapter, Database, Resource } from '@adminjs/sql'
 import makeUserResource from './admin/resources/userResource.js'
 
-AdminJS.registerAdapter({
-  Database,
-  Resource
-})
+AdminJS.registerAdapter({ Database, Resource })
 
 const database = await new Adapter('mysql2', {
   host: process.env.DB_HOST,
@@ -62,19 +56,43 @@ const database = await new Adapter('mysql2', {
 
 const admin = new AdminJS({
   resources: [
-    makeUserResource(database), // users
+    {
+      resource: database.table('users'),
+      options: {
+        properties: { user_id: { isId: true } },
+        sort: { sortBy: 'created_at', direction: 'desc' }
+      }
+    },
     { resource: database.table('posts') },
+    {
+      resource: database.table('likes'),
+      options: {
+        properties: { id: { isId: true } },
+        actions: {
+          new: { isAccessible: false },
+          delete: { isAccessible: false },
+          edit: { isAccessible: false }
+        }
+      }
+    },
     { resource: database.table('categories') },
     { resource: database.table('comments') },
-    { resource: database.table('likes') },
-    { resource: database.table('password_reset_tokens') },
-    { resource: database.table('email_verification_tokens') }
+    {
+      resource: database.table('password_reset_tokens'),
+      options: { properties: { token: { isId: true } } }
+    },
+    {
+      resource: database.table('email_verification_tokens'),
+      options: { properties: { token: { isId: true } } }
+    }
   ]
 })
 
 admin.watch()
-const router = Plugin.buildRouter(admin)
-app.use(admin.options.rootPath, router)
+
+const adminRouter = AdminJSExpress.buildRouter(admin)
+
+app.use(admin.options.rootPath, adminRouter)
 
 app.use(
   '/uploads',
